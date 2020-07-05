@@ -30,7 +30,7 @@ function launch {
 function throttle10k {
 	UNTIL ALTITUDE > 10000 {
 		SET VRSF TO SHIP:VELOCITY:SURFACE.
-		IF  SHIP:AIRSPEED < 240.0 {
+		IF  SHIP:AIRSPEED < 240.0  OR SHIP:SENSORS:ACC:MAG < 1.1 {
 	  		SET NEWTHROTTLE TO THROTTLE + 0.01.
 		}ELSE{
 	  	   SET NEWTHROTTLE  TO THROTTLE - 0.01.
@@ -77,6 +77,7 @@ function ascent {
 		PRINT hori.
 		PRINT SHIP:Q.
 		print ship:sensors:acc:mag.
+		onTickFunction().
 		WAIT 0.25.
 }
 

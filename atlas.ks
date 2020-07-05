@@ -22,4 +22,4 @@ WAIT 1.5.
 
 //STAGE.
 
-ascent(100000, 0, true).
+ascent(100000, 0, true, { if ship:MAXTHRUST = 0 { STAGE. WAIT 2. } }).
