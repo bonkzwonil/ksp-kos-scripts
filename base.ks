@@ -40,6 +40,8 @@ function throttle10k {
 
 	   LOCK THROTTLE TO NEWTHROTTLE.
 
+	   print SHIP:Q.
+	   print SHIP:SENSORS:ACC.
 	   WAIT 0.2.	
    }
 
@@ -47,19 +49,18 @@ function throttle10k {
 }
 
 function ascent {
-	parameter apo.
-	parameter dir.
-	LOCK STEERING TO HEADING(dir:HEADING,88).
+	parameter apo is 100000.
+	parameter myheading is 90.
+	parameter staging is false.
+	parameter onTickFunction is {}.
 
-	trottle10k().
-
-   LOCK STEERING TO HEADING(dir:HEADING,80).
+	LOCK STEERING TO HEADING(myheading,80).
 
 
    UNTIL SHIP:OBT:APOAPSIS > apo {
 
 	  //Cruise by temp
-	  IF (SHIP:SENSORS:TEMP < 450 AND SHIP:SENSORS:ACC:Y < 5 ) { //10m0°C or 5 G
+	  IF (SHIP:SENSORS:TEMP < 450 OR SHIP:SENSORS:ACC:MAG < 1.1) { //AND SHIP:SENSORS:ACC:Y < 5 ) { //10m0°C or 5 G
 	  	  SET NEWTHROTTLE TO THROTTLE + 0.1.
 	  }ELSE {
 	  	  SET NEWTHROTTLE TO THROTTLE - 0.1.
@@ -71,9 +72,11 @@ function ascent {
 
 		SET hori TO (1.0 - (SHIP:OBT:APOAPSIS / apo)) * 90.0.
 
-		LOCK STEERING TO HEADING(dir:HEADING, hori).
+		LOCK STEERING TO HEADING(myHeading, hori).
 		PRINT SHIP:OBT:APOAPSIS.
 		PRINT hori.
+		PRINT SHIP:Q.
+		print ship:sensors:acc:mag.
 		WAIT 0.25.
 }
 
