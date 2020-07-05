@@ -2,7 +2,8 @@ PRINT "== ICBM Library (C) bonk ==".
 
 //high level functions
 
-//*** Ballistic Missile ascent.
+//*** Ballistic Missile ascent -- single Burn
+//
 // Will ascent on the given incline in heading of the Target
 // while continously calculating the predicted
 // Impact and the deviation of the target
@@ -19,17 +20,18 @@ function icbmAscent {
 	parameter incline is 50.
 	parameter xtraBurn is 0.0.
 	parameter tick is 0.25.
+	parameter adjustableEngine is true.
 	parameter debug is false.
 	
-	LOCK STEERING TO HEADING(targetGeo:HEADING,pitch_aim).
+	LOCK STEERING TO HEADING(targetGeo:HEADING,incline).
 	LOCK THROTTLE TO 1.0.
 
 	local minDist is 100000000000000.
 	local dist is 0.
 
 	until minDist < dist-1 and dist < 15000{
-		set dir to directionOf(targetGeo:LAT,targetGeo:LNG).
-		//set vec to vecDrawArgs(ship:position,dir:altitudeposition(0), RGB(1,0,0), "dir", 1.0, TRUE, 1.0).
+	    if debug { set vec to vecDrawArgs(ship:position,targetGeo:altitudeposition(0), RGB(1,0,0), "dir", 1.0, TRUE, 1.0). }
+	
 		local prediction is predictImpact().
 
 		//Calculate planet rotation
@@ -40,9 +42,11 @@ function icbmAscent {
 		set dist to groundDistance(prediction:geo, targetCalc).
 
 		print dist.
-	    if dist < 80000 { lock throttle to 0.6. }
-	    if dist < 50000 { lock throttle to 0.30. }
-	    if dist < 15000 { lock throttle to 0.10. }
+		if adjustableEngine {
+	     if dist < 80000 { lock throttle to 0.6. }
+	     if dist < 50000 { lock throttle to 0.30. }
+	     if dist < 15000 { lock throttle to 0.10. }
+	    }
 	    if dist < minDist { set minDist to dist.}
 
 		if debug {
@@ -51,7 +55,7 @@ function icbmAscent {
 		}
 
 
-        if dist > 5000 { LOCK STEERING TO HEADING(ship:body:geopositionof(zielV):HEADING,pitch_aim). }
+        if dist > 5000 { LOCK STEERING TO HEADING(ship:body:geopositionof(zielV):HEADING,incline). }
         else { lock steering to "kill". }  //No steer at end because of possible overshooting
 
 		wait tick.
@@ -75,8 +79,7 @@ function icbmAscent {
 	SET maineng TO allengines [0].
 
 	FOR eng in allengines {
-		PRINT eng:name.
-		PRINT "CUTOFF".
+		PRINT eng:name + " CUTOFF".
 		eng:SHUTDOWN.
 	}
 
@@ -91,13 +94,14 @@ function icbmAscent {
 function aimedImpact{
 	parameter targetGeo.
 	parameter debug is false.
+	parameter tick is 0.25.
 	until altitude < 1000 {
 	print "Distance: "+targetGeo:distance.
 	local tvec is targetGeo:position.
 	//if altitude < 20000 { set tvec to ship:prograde:vector. }
 	lock steering to tvec.
 	if debug {set vec to vecDrawArgs(ship:position,targetGeo:altitudeposition(0), RGB(1,0,0), "tvec", 1.0, TRUE, 1.0).}
-	wait 0.25.
+	wait tick.
 	local err is abs(eulerDist(tvec:normalized, ship:prograde:vector:normalized)).
 //	print "ERR: " + err.
 //	if  err < 0.10 and altitude < 10000 { maineng:ACTIVATE. lock throttle to 0.25. }
