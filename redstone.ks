@@ -1,9 +1,11 @@
 CLEARSCREEN. PRINT "== Redstone (ICBM) Launch ==".
 
 
-declare targetGeo is LatLng(5.9,-61.5). //Insel :)
-declare xtraBurn is 5.5.
-declare apo is 50000. 
+//declare targetGeo is LatLng(5.9,-61.5). //Insel :)
+declare targetGeo is LatLng(5,-110.0). //Wüste 
+declare xtraBurn is 0.1.
+declare apo is 100000.
+declare pitch_aim is 43.
 //libs
 
 run once base.
@@ -16,40 +18,51 @@ print dir.
 
 run cd. //COUNTDOWN
 
-launch(true).
+launch(true,0.8).
 
 
 LOCK STEERING TO HEADING(dir:HEADING,85).
 
-throttle10k().
+WAIT UNTIL ALTITUDE > 7500.
+
+//throttle10k(). //I think redstone is not capable of fine throttling
 
 set dir to directionOf(targetGeo:LAT,targetGeo:LNG).
 
-LOCK STEERING TO HEADING(dir:HEADING,60).
+LOCK STEERING TO HEADING(dir:HEADING,pitch_aim).
 LOCK THROTTLE TO 1.0.
 
 
 local minDist is 1000000000000.
 local dist is 0.
 
-until minDist < dist {
+until minDist < dist-1 and dist < 15000{
 	set dir to directionOf(targetGeo:LAT,targetGeo:LNG).
 	set vec to vecDrawArgs(ship:position,dir:altitudeposition(0), RGB(1,0,0), "dir", 1.0, TRUE, 1.0).
 	local prediction is predictImpact().
-	set dist to groundDistance(prediction, targetGeo).
+
+	//Calculate planet rotation
+	local rotErr is  targetGeo:VELOCITY:ORBIT * (prediction:time - time):SECONDS .
+	local targetCalc is ship:body:geopositionof(targetGeo:position+rotErr).
+	set zielV to targetCalc:position - prediction:geo:position.
+
+	set dist to groundDistance(prediction:geo, targetCalc).
+
 	print dist.
-if dist < 60000 { lock throttle to 0.7. }
-if dist < 30000 { lock throttle to 0.35. }
-if dist < 10000 { lock throttle to 0.15. }
+if dist < 80000 { lock throttle to 0.6. }
+if dist < 50000 { lock throttle to 0.30. }
+if dist < 15000 { lock throttle to 0.10. }
 if dist < minDist { set minDist to dist.}
 
-local errVec is rotatefromto(prediction:position, targetGeo:position).
-set evecd to vecDrawArgs(prediction:position, targetGeo:position-prediction:position, RGB(1,1,0), "err", 1.0, TRUE, 1.0).
+local errVec is rotatefromto(prediction:geo:position, targetCalc:position).
+set evecd to vecDrawArgs(prediction:geo:position, targetCalc:position-prediction:geo:position, RGB(1,1,0), "err", 1.0, TRUE, 1.0).
 
-LOCK STEERING TO HEADING(dir:HEADING,60).
 
-   wait 0.5.
+if dist > 5000 { LOCK STEERING TO HEADING(ship:body:geopositionof(zielV):HEADING,pitch_aim). }
+else { lock steering to "kill". }  //No steer at end because of overshooting
+   wait 0.25.
 }
+lock steering to ship:prograde.
 
 print "Reached nearest course error".
 print dist.
@@ -64,6 +77,8 @@ print "ballistic phase".
 print "MECO".
 
 LIST ENGINES IN allengines.
+
+SET maineng TO allengines [0].
 
 FOR eng in allengines {
 	PRINT eng:name.
@@ -83,11 +98,11 @@ WAIT UNTIL eta:apoapsis < 10.
 
 // DOwn
 
-set dir to directionOf(5.9,-61.5).
+set dir to directionOf(targetGeo:LAT,targetGeo:LNG).
 //RCS ON. // no rcs on redstone
 lock steering to dir:position.
 WAIT 10.
-until altitude < 5000 {
+until altitude < 1000 {
 	print dir.
 	print dir:distance.
 	local tvec is dir:position.
@@ -97,6 +112,6 @@ until altitude < 5000 {
 	wait 0.25.
 	local err is abs(eulerDist(tvec:normalized, ship:prograde:vector:normalized)).
 	print err.
-	if  err < 0.05 { lock throttle to 0.1. }
+//	if  err < 0.10 and altitude < 10000 { maineng:ACTIVATE. lock throttle to 0.25. }
 }
 

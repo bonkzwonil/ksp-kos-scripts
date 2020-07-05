@@ -4,10 +4,11 @@
 
 
 function launch {
-	parameter clamp.
+	parameter clamp is true.
+	parameter thr is 0.8.
 	PRINT "LAUNCH!".
 	STAGE.
-    FROM {local tr is 0.3.} until tr > 0.85 step { set tr to tr + 0.01.} do {
+    FROM {local tr is 0.3.} until tr >= thr step { set tr to tr + 0.01.} do {
 	  LOCK THROTTLE TO tr.	 
  	  wait 0.05.
   }

@@ -35,7 +35,7 @@ function aimTraj {
 	print coords.
 	local aim is coords:altitudePosition(alt).
 	local dir is rotatefromto(ship:position, aim).
-	vecDrawArgs(ship:position, aim, RGB(1,0,0), "TrajAim", 1.0, TRUE, 1.0).
+	//vecDrawArgs(ship:position, aim, RGB(1,0,0), "TrajAim", 1.0, TRUE, 1.0).
 
 	return coords.
 }
@@ -49,32 +49,35 @@ function predictImpact
 	local i is TIME+eta:apoapsis.
 	local pos is 0.
 	local geo is 0.
-	print alt.
+	//print alt.
 	until alt < 0 {
 		//simulate
 		set i to i+1.
 		set pos to positionat(ship, i).
 		set geo to ship:body:geopositionof(pos).
 		set alt to ship:body:altitudeof(pos).
-		print alt.
+		//print alt.
     }
 	print "Impact at".
 	print geo.
+	print i.
 
-	return geo.
+	return LEXICON("geo",geo, "time", i).
+}
+
+function eulerDist {
+	parameter position1.
+	parameter position2.
+	local x is position1:x - position2:x.
+	local y is position1:y - position2:y.
+	local z is position1:z - position2:z.
+
+	return sqrt(x*x +y*y + z*z).
 }
 
 function groundDistance {
 	parameter geo1.
 	parameter geo2.
-
-	local x is geo1:position:x - geo2:position:x.
-	local y is geo1:position:y - geo2:position:y.
-	local z is geo1:position:z - geo2:position:z.
-
-	return sqrt(x*x +y*y + z*z).
+	return eulerDist(geo1:position, geo2:position).
 }
 
-predictimpact().
-
-print groundDistance(predictImpact(), LatLng(5.9, -61.5)).
