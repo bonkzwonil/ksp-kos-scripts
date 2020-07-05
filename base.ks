@@ -5,7 +5,6 @@
 
 function launch {
 	parameter clamp.
-	LOCK STEERING TO UP.
 	PRINT "LAUNCH!".
 	STAGE.
     FROM {local tr is 0.3.} until tr > 0.85 step { set tr to tr + 0.01.} do {
@@ -15,7 +14,10 @@ function launch {
   if clamp {
 	PRINT "CLAMP".
 	  STAGE. //CLAMPS
+	  
   }
+  wait 0.5.
+  LOCK STEERING TO UP.
 
 	UNTIL AIRSPEED  > 100 {
 		SET NEWTHROTTLE TO THROTTLE + 0.01.

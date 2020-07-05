@@ -1,25 +1,37 @@
 CLEARSCREEN. PRINT "==V2 Launch==".
 
-declare zielzeit is 57.
-declare zielkurs is 78.
+
+// Ziel: Insel :) 
+declare zielzeit is 56.  //Ziel: Insel :)
+declare zielkurs is 63.
 //libs
 
 run once base.
 
-//run once aim.
-
+print "Ready".
+//STAGE. //(platform)
+LOCK THROTTLE TO 0.03.
 //run cd. //COUNTDOWN
 
-launch(false).
+launch(true).
 
 
-//originally at V2 heading was always the same, determined by placing the rocket before start (special marked fin)
+
+//originally at V2 heading was always the same fixed bearing, determined by placing the rocket before start (special marked fin)
+//for convinience we use heading here
 Wait 3.0.
-LOCK STEERING TO HEADING(zielkurs,55).
 LOCK THROTTLE TO 1.0.
+set dir to HEADING(zielkurs,65). 
 
-//throttle10k().
+wait 6.
+set timeend to time + zielzeit.
+set dir to HEADING(zielkurs,43). //Original V2 was 43°
+lock steering to dir.
+WAIT zielzeit-6.
 
 
+LOCK THROTTLE TO 0.0.
+lock steering to ship:prograde. //Ballistic flight now
+print "ballistische flugphase erreicht.".
 
-WAIT zielzeit.
+//End Program
