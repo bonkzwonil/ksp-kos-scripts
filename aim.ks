@@ -6,8 +6,8 @@ function directionof {
 
 	set coords to Kerbin:GeopositionLatLng(lat, lon).
 
-	print "Distance".
-	print coords:distance.
+	//print "Distance".
+	//print coords:distance.
 
 	return coords.
 }
@@ -32,7 +32,7 @@ function aimTraj {
 	parameter lng.
 	parameter alt.
 	local coords is trajMiddle(directionOf(lat,lng)).
-	print coords.
+	//print coords.
 	local aim is coords:altitudePosition(alt).
 	local dir is rotatefromto(ship:position, aim).
 	//vecDrawArgs(ship:position, aim, RGB(1,0,0), "TrajAim", 1.0, TRUE, 1.0).
@@ -58,9 +58,9 @@ function predictImpact
 		set alt to ship:body:altitudeof(pos).
 		//print alt.
     }
-	print "Impact at".
-	print geo.
-	print i.
+	//print "Impact at".
+	//print geo.
+	//print i.
 
 	return LEXICON("geo",geo, "time", i).
 }
