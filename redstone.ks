@@ -44,7 +44,9 @@ if dist < 10000 { lock throttle to 0.15. }
 if dist < minDist { set minDist to dist.}
 
 local errVec is rotatefromto(prediction:position, targetGeo:position).
-LOCK STEERING TO HEADING(dir:HEADING,60):vector + errVec:vector.
+set evecd to vecDrawArgs(prediction:position, targetGeo:position-prediction:position, RGB(1,1,0), "err", 1.0, TRUE, 1.0).
+
+LOCK STEERING TO HEADING(dir:HEADING,60).
 
    wait 0.5.
 }
