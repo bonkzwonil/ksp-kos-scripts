@@ -3,14 +3,13 @@ CLEARSCREEN. PRINT "== Redstone (ICBM) Launch ==".
 //Like the Original Redstone, this one also has problems with far targets, as temperature gets too high on
 // descent and it disintegrates :)
 
-// Try at Wüste
 
 // CONFIG
 
 
 declare targetGeo is LatLng(5.9,-61.5). //Insel :)
 //declare targetGeo is LatLng(5,-110.0). //Wüste  -- would be perfect hit but disintegrates due to thermal stress
-//declare targetGeo is LatLng(-0.097,-74.557). //KSP ;) 
+//declare targetGeo is LatLng(-0.0969444,-74.6169444). //KSC ;) 
 declare xtraBurn is 0.1.
 declare apo is 100000.
 declare pitch_aim is 43.
